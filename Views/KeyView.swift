@@ -52,10 +52,10 @@ struct KeyView: View {
                         } label: {
                             Text(elem.rawValue)
                                 .font(.system(size: 30))
-                                .frame(width: 60, height: 60)
+                                .frame(width: self.getWidth(elem: elem), height: self.getHeight())
                                 .background(elem.buttonColor)
                                 .foregroundColor(.black)
-                                .cornerRadius(30)
+                                .cornerRadius(self.getWidth(elem: elem))
                                 .shadow(color: .purple.opacity(0.8), radius: 30)
                         }.padding(.bottom, 4)
 
@@ -68,8 +68,81 @@ struct KeyView: View {
 
     }
     
+    func getWidth(elem : Keys) -> CGFloat{
+        if(elem == .zero){
+            return (UIScreen.main.bounds.width - (5*10))/2
+        }
+        return (UIScreen.main.bounds.width - (5*10))/4
+    }
+    
+    func getHeight() -> CGFloat{
+        return (UIScreen.main.bounds.width - (5*10))/4
+    }
+    
     func didTap(button : Keys){
-        print("helo")
+        switch button{
+        case .add, .subtract, .multiply, .divide, .equla:
+            if(button == .add){
+                self.currentOperation = .add
+                self.runningNumber = Int(self.value) ?? Int(Float(self.value) ?? 0)
+            } else if(button == .subtract){
+                self.currentOperation = .substract
+                self.runningNumber = Int(self.value) ?? Int(Float(self.value) ?? 0)
+            } else if(button == .multiply){
+                self.currentOperation = .multiply
+                self.runningNumber = Int(self.value) ?? Int(Float(self.value) ?? 0)
+            } else if(button == .divide){
+                self.currentOperation = .divide
+                self.runningNumber = Int(self.value) ?? Int(Float(self.value) ?? 0)
+            } else if(button == .equla){
+                let runningValue = self.runningNumber;
+                let currentValue = Int(self.value) ?? Int(Float(self.value) ?? 0);
+                switch self.currentOperation {
+                case .add:
+                    self.value = "\(runningValue + currentValue)"
+                case .substract:
+                    self.value = "\(runningValue - currentValue)"
+                case .divide:
+                    self.value = "\(runningValue * currentValue)"
+                case .multiply:
+                    self.value = "\(runningValue / currentValue)"
+                case .none:
+                    break
+                }
+                
+            }
+            if(button != .equla){
+                self.value = "0"
+            }
+        case .clear:
+            self.value = "0";
+            self.runningNumber = 0;
+            self.currentOperation = .none;
+        case .decimal, .negative, .percent:
+            if(button == .negative){
+                self.value = "\((Int(self.value) ?? 0) * -1)"
+            } else if(button == .percent){
+                self.value = "\((Int(self.value) ?? 0) % 100)"
+            } else {
+                let dot = button.rawValue;
+                if self.value == "0"{
+                    self.value = "0.";
+                } else {
+                    self.value = "\(self.value)\(dot)"
+                }
+            }
+            break
+            
+        default:
+            let number = button.rawValue;
+            if self.value == "0"{
+                self.value = number;
+            } else {
+                self.value = "\(self.value)\(number)"
+            }
+            
+        }
+        
     }
 }
 
